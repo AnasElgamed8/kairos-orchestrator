@@ -1,9 +1,11 @@
 mod timer;
 mod tasks;
 mod schedule;
+mod hyprland;
 use timer::{TimerManager, TimerState};
 use tasks::{TaskManager, Task};
 use schedule::{ScheduleManager, ScheduledTask};
+use hyprland::HyprlandManager;
 use tauri::{State, Manager};
 use std::sync::Arc;
 use discord_rpc::{ClientId, UserPresence};
@@ -11,13 +13,15 @@ use uuid::Uuid;
 use chrono::Local;
 
 #[tauri::command]
-fn toggle_timer(state: State<'_, Arc<TimerManager>>) {
+fn toggle_timer(state: State<'_, Arc<TimerManager>>, hypr: State<'_, Arc<HyprlandManager>>) {
     state.toggle();
+    let is_running = state.state.lock().unwrap().is_running;
+    hypr.trigger_focus_mode(is_running);
 }
 
 #[tauri::command]
-fn reset_timer(state: State<'_, Arc<TimerManager>>, minutes: u32) {
-    state.reset(minutes);
+fn reset_timer(state: State<'_, Arc<TimerManager>>) {
+    state.reset(25);
 }
 
 #[tauri::command]
@@ -79,6 +83,7 @@ fn main() {
     let timer_manager = Arc::new(TimerManager::new(25));
     let task_manager = Arc::new(TaskManager::new("/opt/data/home/kairos/tasks.json"));
     let schedule_manager = Arc::new(ScheduleManager::new("/opt/data/home/kairos/schedule.json"));
+    let hyprland_manager = Arc::new(HyprlandManager::new());
 
     let tm_clone = Arc::clone(&timer_manager);
     tokio::spawn(async move {
@@ -91,6 +96,7 @@ fn main() {
         .manage(timer_manager)
         .manage(task_manager)
         .manage(schedule_manager)
+        .manage(hyprland_manager)
         .invoke_handler(tauri::generate_handler![
             toggle_timer, 
             reset_timer, 
