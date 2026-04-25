@@ -39,7 +39,7 @@ To enable Rich Presence:
 
 3. **Run in development mode:**
    ```bash
-   npm run tauri dev
+   WEBKIT_DISABLE_COMPOSITING_MODE=1 npm run tauri dev
    ```
 
 4. **Build for production:**

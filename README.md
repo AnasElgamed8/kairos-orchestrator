@@ -10,13 +10,13 @@ Kairos is a high-performance study orchestrator built for Arch Linux (Hyprland) 
 - **Evolutionary Design:** Continuous R&D via automated research loops.
 
 ## 🛠 Tech Stack
-- **Backend:** Rust + Tauri
-- **Frontend:** React + TypeScript + Tailwind CSS
-- **IPC:** Hyprland `hyprctl`
-- **Presence:** Discord RPC
+- **Backend:** Rust + Tauri (userspace-networking for remote admin).
+- **Frontend:** React + TypeScript + Tailwind CSS (Glassmorphic Design).
+- **IPC:** Hyprland `hyprctl`.
+- **Presence:** Discord RPC.
 
 ## 📜 Installation
-*(Instructions coming soon in Phase 1)*
+Refer to `INSTALL.md` for the full setup guide.
 
 ---
 *Built with love and tough-love by Lexius for Anas.*
