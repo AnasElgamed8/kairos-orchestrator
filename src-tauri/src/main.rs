@@ -1,11 +1,14 @@
 mod timer;
 mod tasks;
+mod schedule;
 use timer::{TimerManager, TimerState};
 use tasks::{TaskManager, Task};
+use schedule::{ScheduleManager, ScheduledTask};
 use tauri::{State, Manager};
 use std::sync::Arc;
 use discord_rpc::{ClientId, UserPresence};
 use uuid::Uuid;
+use chrono::Local;
 
 #[tauri::command]
 fn toggle_timer(state: State<'_, Arc<TimerManager>>) {
@@ -37,6 +40,16 @@ fn decompose_task(state: State<'_, Arc<TaskManager>>, task_id: Uuid, steps: Vec<
     state.decompose(task_id, steps);
 }
 
+#[tauri::command]
+fn get_schedule(state: State<'_, Arc<ScheduleManager>>) -> Vec<ScheduledTask> {
+    state.daily_plan.lock().unwrap().clone()
+}
+
+#[tauri::command]
+fn add_to_schedule(state: State<'_, Arc<ScheduleManager>>, task_id: Uuid, time: String, duration: u32, energy: u8) {
+    state.add_to_schedule(task_id, time, duration, energy);
+}
+
 fn start_discord_thread(timer_manager: Arc<TimerManager>, app_id: String) {
     std::thread::spawn(move || {
         let client_id = ClientId::from_str(&app_id).expect("Invalid Client ID");
@@ -65,6 +78,7 @@ fn main() {
     let app_id = "1497640735304974396".to_string();
     let timer_manager = Arc::new(TimerManager::new(25));
     let task_manager = Arc::new(TaskManager::new("/opt/data/home/kairos/tasks.json"));
+    let schedule_manager = Arc::new(ScheduleManager::new("/opt/data/home/kairos/schedule.json"));
 
     let tm_clone = Arc::clone(&timer_manager);
     tokio::spawn(async move {
@@ -76,13 +90,16 @@ fn main() {
     tauri::Builder::default()
         .manage(timer_manager)
         .manage(task_manager)
+        .manage(schedule_manager)
         .invoke_handler(tauri::generate_handler![
             toggle_timer, 
             reset_timer, 
             get_timer_state, 
             get_tasks, 
             add_task, 
-            decompose_task
+            decompose_task,
+            get_schedule,
+            add_to_schedule
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
