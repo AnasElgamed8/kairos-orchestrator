@@ -8,7 +8,7 @@ use schedule::{ScheduleManager, ScheduledTask};
 use hyprland::HyprlandManager;
 use tauri::{State, Manager};
 use std::sync::Arc;
-use discord_rpc::{ClientId, UserPresence};
+use discord_rich_presence::{ClientId, UserPresence};
 use uuid::Uuid;
 use chrono::Local;
 use std::fs;
@@ -21,8 +21,8 @@ fn toggle_timer(state: State<'_, Arc<TimerManager>>, hypr: State<'_, Arc<Hyprlan
 }
 
 #[tauri::command]
-fn reset_timer(state: State<'_, Arc<TimerManager>>) {
-    state.reset(25);
+fn reset_timer(state: State<'_, Arc<TimerManager>>, minutes: u32) {
+    state.reset(minutes);
 }
 
 #[tauri::command]
@@ -58,7 +58,7 @@ fn add_to_schedule(state: State<'_, Arc<ScheduleManager>>, task_id: Uuid, time: 
 fn start_discord_thread(timer_manager: Arc<TimerManager>, app_id: String) {
     std::thread::spawn(move || {
         let client_id = ClientId::from_str(&app_id).expect("Invalid Client ID");
-        let mut session = discord_rpc::Session::new(client_id).expect("Discord session failed");
+        let mut session = discord_rich_presence::Session::new(client_id).expect("Discord session failed");
         let mut rx = timer_manager.tx.subscribe();
 
         loop {
@@ -82,7 +82,6 @@ fn start_discord_thread(timer_manager: Arc<TimerManager>, app_id: String) {
 fn main() {
     let app_id = "1497640735304974396".to_string();
     
-    // Resolve config directory
     let config_dir = dirs::config_dir()
         .expect("Could not find config directory")
         .join("kairos");
@@ -119,7 +118,7 @@ fn main() {
             add_task, 
             decompose_task,
             get_schedule,
-            add_to_schedule
+            add_to_//schedule
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
