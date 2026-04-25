@@ -1,43 +1,64 @@
-use tauri::Manager;
-use std::sync::{Arc, Mutex};
-use discord_rpc::{ClientId, UserId, UserPresence};
+mod timer;
+use timer::{TimerManager, TimerState};
+use tauri::{State, Manager};
+use std::sync::Arc;
+use discord_rpc::{ClientId, UserPresence};
 
-struct AppState {
-    timer_running: Arc<Mutex<bool>>,
-    current_task: Arc<Mutex<String>>,
+#[tauri::command]
+fn toggle_timer(state: State<'_, Arc<TimerManager>>) {
+    state.toggle();
 }
 
-fn setup_discord_rpc(app_id: &str) {
-    let client_id = ClientId::from_str(app_id).expect("Invalid Client ID");
-    let mut session = discord_rpc::Session::new(client_id).expect("Failed to create Discord session");
-    
-    let presence = UserPresence {
-        state: "Priming...".to_string(),
-        details: "Setting up the Flow State".to_string(),
-        start_timestamp: std::time::SystemTime::now(),
-        assets: None,
-    };
-    
-    session.set_presence(presence).expect("Failed to set presence");
+#[tauri::command]
+fn reset_timer(state: State<'_, Arc<TimerManager>>, minutes: u32) {
+    state.reset(minutes);
+}
+
+#[tauri::command]
+fn get_timer_state(state: State<'_, Arc<TimerManager>>) -> TimerState {
+    state.state.lock().unwrap().clone()
+}
+
+fn start_discord_thread(timer_manager: Arc<TimerManager>, app_id: String) {
+    std::thread::spawn(move || {
+        let client_id = ClientId::from_str(&app_id).expect("Invalid Client ID");
+        let mut session = discord_rpc::Session::new(client_id).expect("Discord session failed");
+        let mut rx = timer_manager.tx.subscribe();
+
+        loop {
+            if let Ok(state) = rx.recv().blocking_recv() {
+                let presence = UserPresence {
+                    state: if state.is_running { 
+                        format!("{} - {}s remaining", state.current_task, state.remaining_seconds) 
+                    } else { 
+                        "Taking a break".to_string() 
+                    },
+                    details: "Achieving Flow State".to_string(),
+                    start_timestamp: std::time::SystemTime::now(),
+                    assets: None,
+                };
+                let _ = session.set_presence(presence);
+            }
+        }
+    });
 }
 
 fn main() {
-    let app_id = "1497640735304974396";
-    
-    // We start Discord RPC in a separate thread to avoid blocking the UI
-    std::thread::spawn(move || {
-        setup_discord_rpc(app_id);
-        loop {
-            // In a real app, this would update based on AppState
-            std::thread::sleep(std::time::Duration::from_secs(15));
-        }
+    let app_id = "1497640735304974396".to_string();
+    let timer_manager = Arc::new(TimerManager::new(25)); // Default 25m
+
+    // Start the timer tick loop
+    let tm_clone = Arc::clone(&timer_manager);
+    tokio::spawn(async move {
+        tm_clone.tick().await;
     });
 
+    // Start Discord integration
+    start_discord_thread(Arc::clone(&timer_manager), app_id);
+
     tauri::Builder::default()
-        .manage(AppState {
-            timer_running: Arc::new(Mutex::new(false)),
-            current_task: Arc::new(Mutex::new("Idle".to_string())),
-        })
+        .manage(timer_manager)
+        .invoke_handler(tauri::generate_handler![toggle_timer, reset_timer, get_timer_state])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
