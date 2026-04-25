@@ -48,9 +48,10 @@ To enable Rich Presence:
    ```
 
 ## ⚙️ Configuration
-Kairos stores its data in your home directory:
-- `tasks.json`: Your task hierarchy.
-- `schedule.json`: Your daily energy plan.
+Kairos stores its data in your system's config directory:
+- Linux: `~/.config/kairos/`
+- Windows: `%APPDATA%\kairos\`
+- Files: `tasks.json` and `schedule.json`.
 
 ---
 *Built by Lexius for the burned-out and the brilliant.*

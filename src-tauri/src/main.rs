@@ -11,6 +11,7 @@ use std::sync::Arc;
 use discord_rpc::{ClientId, UserPresence};
 use uuid::Uuid;
 use chrono::Local;
+use std::fs;
 
 #[tauri::command]
 fn toggle_timer(state: State<'_, Arc<TimerManager>>, hypr: State<'_, Arc<HyprlandManager>>) {
@@ -80,9 +81,22 @@ fn start_discord_thread(timer_manager: Arc<TimerManager>, app_id: String) {
 
 fn main() {
     let app_id = "1497640735304974396".to_string();
+    
+    // Resolve config directory
+    let config_dir = dirs::config_dir()
+        .expect("Could not find config directory")
+        .join("kairos");
+    
+    if !config_dir.exists() {
+        fs::create_dir_all(&config_dir).expect("Could not create config directory");
+    }
+
+    let tasks_path = config_dir.join("tasks.json").to_string_lossy().into_owned();
+    let schedule_path = config_dir.join("schedule.json").to_string_lossy().into_owned();
+
     let timer_manager = Arc::new(TimerManager::new(25));
-    let task_manager = Arc::new(TaskManager::new("/opt/data/home/kairos/tasks.json"));
-    let schedule_manager = Arc::new(ScheduleManager::new("/opt/data/home/kairos/schedule.json"));
+    let task_manager = Arc::new(TaskManager::new(&tasks_path));
+    let schedule_manager = Arc::new(ScheduleManager::new(&schedule_path));
     let hyprland_manager = Arc::new(HyprlandManager::new());
 
     let tm_clone = Arc::clone(&timer_manager);
