@@ -67,7 +67,6 @@ impl TaskManager {
                 .ok_or("Task not found")?
         };
 
-        // AI Prompt for "Tiny Steps"
         let prompt = format!(
             "Break down the task '{}' into 4-6 extremely small, concrete, physical first steps. \
             Each step should be a simple action. Return ONLY a JSON array of strings. \
@@ -75,7 +74,6 @@ impl TaskManager {
             task_title
         );
 
-        // This is a generic implementation; in production, we'd use the specific provider's API
         let response = self.http_client.post("https://api.openai.com/v1/chat/completions")
             .bearer_auth(api_key)
             .json(&serde_json::json!({
@@ -95,7 +93,7 @@ impl TaskManager {
         Ok(())
     }
 
-    fn apply_steps(&self, task_id: uuid::Uuid, steps: Vec<String>) {
+    pub fn apply_steps(&self, task_id: uuid::Uuid, steps: Vec<String>) {
         let mut tasks = self.tasks.lock().unwrap();
         if let Some(task) = tasks.iter_mut().find(|t| t.id == task_id) {
             task.steps = steps.into_iter().map(|s| TinyStep {
