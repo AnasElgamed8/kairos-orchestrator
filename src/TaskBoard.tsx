@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
-import { Task } from './types'; // Assuming types are defined
+import { Task, TinyStep } from './types';
 
 const TaskBoard = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -14,8 +14,12 @@ const TaskBoard = () => {
   }, []);
 
   const loadTasks = async () => {
-    const currentTasks = await invoke('get_tasks');
-    setTasks(currentTasks);
+    try {
+      const currentTasks = await invoke<Task[]>('get_tasks');
+      setTasks(currentTasks);
+    } catch (e) {
+      console.error("Failed to load tasks", e);
+    }
   };
 
   const addTask = async () => {
@@ -26,8 +30,7 @@ const TaskBoard = () => {
   };
 
   const decomposeTask = async (taskId: string) => {
-    // In a real app, this would call an LLM. 
-    // For the prototype, we simulate the "AI Slicing" effect.
+    // Prototype: using a fixed set of steps since LLM integration requires API keys in frontend
     const mockSteps = [
       "Open the required documents",
       "Read the first two pages",
@@ -81,9 +84,9 @@ const TaskBoard = () => {
             </div>
             
             <div className="flex flex-col gap-2 ml-4">
-              {task.steps.map(step => (
+              {task.steps.map((step: TinyStep) => (
                 <div key={step.id} className="flex items-center gap-2 text-sm opacity-80">
-                  <input type="checkbox" checked={step.completed} className="accent-primary-color" />
+                  <input type="checkbox" checked={step.completed} readOnly className="accent-primary-color" />
                   <span>{step.description}</span>
                 </div>
               ))}

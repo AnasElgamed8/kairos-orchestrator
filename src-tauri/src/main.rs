@@ -6,7 +6,7 @@ use timer::{TimerManager, TimerState};
 use tasks::{TaskManager, Task};
 use schedule::{ScheduleManager, ScheduledTask};
 use hyprland::HyprlandManager;
-use tauri::{State, Manager};
+use tauri::{State};
 use std::sync::Arc;
 use uuid::Uuid;
 use std::fs;
@@ -40,9 +40,6 @@ fn add_task(state: State<'_, Arc<TaskManager>>, title: String, energy: u8) {
 
 #[tauri::command]
 fn decompose_task(state: State<'_, Arc<TaskManager>>, task_id: Uuid, steps: Vec<String>) {
-    // We call the AI decomposition logic internally
-    // In a real app, this would be an async call to decompose_with_ai
-    // For the prototype, we just apply the steps passed from frontend
     state.apply_steps(task_id, steps);
 }
 
@@ -56,8 +53,9 @@ fn add_to_schedule(state: State<'_, Arc<ScheduleManager>>, task_id: Uuid, time: 
     state.add_to_schedule(task_id, time, duration, energy);
 }
 
-fn main() {
-    let app_id = "1497640735304974396".to_string();
+#[tokio::main]
+async fn main() {
+    let timer_manager = Arc::new(TimerManager::new(25));
     
     let config_dir = dirs::config_dir()
         .expect("Could not find config directory")
@@ -70,7 +68,6 @@ fn main() {
     let tasks_path = config_dir.join("tasks.json").to_string_lossy().into_owned();
     let schedule_path = config_dir.join("schedule.json").to_string_lossy().into_owned();
 
-    let timer_manager = Arc::new(TimerManager::new(25));
     let task_manager = Arc::new(TaskManager::new(&tasks_path));
     let schedule_manager = Arc::new(ScheduleManager::new(&schedule_path));
     let hyprland_manager = Arc::new(HyprlandManager::new());

@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
+import { Task, TimerState } from './types';
 
 const Timer = () => {
-  const [state, setState] = useState({ remaining_seconds: 0, is_running: false, current_task: 'Idle' });
+  const [state, setState] = useState<TimerState>({ 
+    remaining_seconds: 0, 
+    is_running: false, 
+    current_task: 'Idle' 
+  });
 
   useEffect(() => {
     const updateTimer = async () => {
-      const newState = await invoke('get_timer_state');
-      setState(newState);
+      try {
+        const newState = await invoke<TimerState>('get_timer_state');
+        setState(newState);
+      } catch (e) {
+        console.error("Failed to get timer state", e);
+      }
     };
 
     const interval = setInterval(updateTimer, 1000);
@@ -29,7 +38,7 @@ const Timer = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-bg-color text-text-color">
+    <div className="flex flex-col items-center justify-center h-full bg-bg-color text-text-color">
       <div className="glass-panel flex flex-col items-center gap-6 w-80">
         <h1 className="text-2xl font-bold text-primary-color">Kairos</h1>
         
