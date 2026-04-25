@@ -1,42 +1,40 @@
 # Kairos: The Cognitive Orchestrator
 
 ## Vision
-Kairos is not a timer. It is a system designed to mitigate executive dysfunction and maximize cognitive throughput for students with burnout/ADHD patterns. It treats "Focus" as a biological state, not a willpower struggle.
+Kairos is a system designed to mitigate executive dysfunction and maximize cognitive throughput. It treats "Focus" as a biological state, not a willpower struggle.
 
 ## Core Philosophy
-1. **Reduce Friction:** The hardest part is starting. Kairos focuses on the "First Physical Movement."
-2. **Cognitive Load Management:** Schedules are based on energy, not just time.
+1. **Reduce Friction:** Focus on the "First Physical Movement."
+2. **Cognitive Load Management:** Energy-based scheduling.
 3. **Environmental Synergy:** Integration with Hyprland to create a physical "Focus Zone."
 4. **AI-Driven Decomposition:** Transforming overwhelming tasks into Tiny Steps.
 
-## Technical Stack
-- **Backend:** Rust (Tauri)
-- **Frontend:** React + TypeScript + Tailwind CSS
-- **State Management:** Zustand
-- **Integrations:**
-    - `discord-rpc` for presence.
-    - `hyprctl` for environment control.
-    - `libnotify` / `dbus` for notifications.
-    - Local/API LLM for task decomposition.
+## Technical Architecture
+### Backend (Rust / Tauri)
+- **TimerManager:** Asynchronous countdown engine using `tokio` and `broadcast` channels.
+- **TaskManager:** Hierarchical task system (Tasks $\rightarrow$ TinySteps) with JSON persistence.
+- **ScheduleManager:** Daily planning module for energy-aware time-blocking.
+- **HyprlandManager:** IPC bridge to `hyprctl` and `notify-send` for environment control.
+- **DiscordRPC:** Real-time presence updates based on timer state.
+
+### Frontend (React / TypeScript / Tailwind)
+- **Cognitive Dashboard:** Split-pane layout (Focus Core vs. Orchestrator).
+- **The Slicer:** UI for triggering task decomposition.
+- **Theme System:** CSS-variable based system (Baseline: Catppuccin Mocha).
 
 ## Feature Roadmap
-### Phase 1: Foundation (The "Functional" App)
-- [ ] Basic Pomodoro/Stopwatch logic.
-- [ ] Task list with persistence.
-- [ ] Discord Rich Presence.
-- [ ] Basic Hyprland notifications.
+### Phase 1: Foundation (Completed)
+- [x] Core Timer, Task Management, and Discord Sync.
+- [x] Native Hyprland Integration.
+- [x] Basic Dashboard UI.
 
-### Phase 2: Cognitive Orchestration (The "Smart" App)
-- [ ] AI Task Decomposition (Tiny Steps).
-- [ ] Morning Scheduling Module.
-- [ ] Energy-based task weighting.
-- [ ] "First Physical Movement" prompts.
+### Phase 2: Cognitive Orchestration (Current)
+- [ ] Morning Planning Interface.
+- [ ] LLM-integrated Task Slicing.
+- [ ] Automatic Schedule Triggering.
 
-### Phase 3: Environmental Mastery (The "Proud" App)
-- [ ] Hyprland Workspace switching via IPC.
-- [ ] Automatic wallpaper/theme switching.
-- [ ] Distraction blocking (Process killing/DNS).
-- [ ] Windows compatibility build.
-
-## The Evolution Loop
-A cron job will run every 10 minutes to research productivity improvements, analyze logs, and propose feature updates via Telegram.
+### Phase 3: Environmental Mastery (Pending)
+- [ ] Dynamic Workspace Warping.
+- [ ] Distraction Blocking (Process Management).
+- [ ] Community Theme Support.
+- [ ] Windows Compatibility Build.
