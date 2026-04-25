@@ -1,8 +1,9 @@
 use std::sync::{Arc, Mutex};
 use tokio::sync::broadcast;
 use std::time::Duration;
+use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct TimerState {
     pub remaining_seconds: u32,
     pub is_running: bool,

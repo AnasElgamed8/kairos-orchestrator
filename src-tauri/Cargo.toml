@@ -11,9 +11,10 @@ tauri = { version = "1.5", features = ["shell-all", "system-tray"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "1.0", features = ["full"] }
-discord-rich-presence = "0.1"
+# Removed the problematic discord crate for now to ensure build success
 chrono = "0.4"
 log = "0.4"
 env_logger = "0.10"
 uuid = { version = "1.0", features = ["v4", "serde"] }
 dirs = "5.0"
+reqwest = { version = "0.11", features = ["json"] }

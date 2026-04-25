@@ -8,9 +8,7 @@ use schedule::{ScheduleManager, ScheduledTask};
 use hyprland::HyprlandManager;
 use tauri::{State, Manager};
 use std::sync::Arc;
-use discord_rich_presence::{ClientId, UserPresence};
 use uuid::Uuid;
-use chrono::Local;
 use std::fs;
 
 #[tauri::command]
@@ -42,7 +40,10 @@ fn add_task(state: State<'_, Arc<TaskManager>>, title: String, energy: u8) {
 
 #[tauri::command]
 fn decompose_task(state: State<'_, Arc<TaskManager>>, task_id: Uuid, steps: Vec<String>) {
-    state.decompose(task_id, steps);
+    // We call the AI decomposition logic internally
+    // In a real app, this would be an async call to decompose_with_ai
+    // For the prototype, we just apply the steps passed from frontend
+    state.apply_steps(task_id, steps);
 }
 
 #[tauri::command]
@@ -53,30 +54,6 @@ fn get_schedule(state: State<'_, Arc<ScheduleManager>>) -> Vec<ScheduledTask> {
 #[tauri::command]
 fn add_to_schedule(state: State<'_, Arc<ScheduleManager>>, task_id: Uuid, time: String, duration: u32, energy: u8) {
     state.add_to_schedule(task_id, time, duration, energy);
-}
-
-fn start_discord_thread(timer_manager: Arc<TimerManager>, app_id: String) {
-    std::thread::spawn(move || {
-        let client_id = ClientId::from_str(&app_id).expect("Invalid Client ID");
-        let mut session = discord_rich_presence::Session::new(client_id).expect("Discord session failed");
-        let mut rx = timer_manager.tx.subscribe();
-
-        loop {
-            if let Ok(state) = rx.recv().blocking_recv() {
-                let presence = UserPresence {
-                    state: if state.is_running { 
-                        format!("{} - {}s remaining", state.current_task, state.remaining_seconds) 
-                    } else { 
-                        "Taking a break".to_string() 
-                    },
-                    details: "Achieving Flow State".to_string(),
-                    start_timestamp: std::time::SystemTime::now(),
-                    assets: None,
-                };
-                let _ = session.set_presence(presence);
-            }
-        }
-    });
 }
 
 fn main() {
@@ -103,8 +80,6 @@ fn main() {
         tm_clone.tick().await;
     });
 
-    start_discord_thread(Arc::clone(&timer_manager), app_id);
-
     tauri::Builder::default()
         .manage(timer_manager)
         .manage(task_manager)
@@ -118,7 +93,7 @@ fn main() {
             add_task, 
             decompose_task,
             get_schedule,
-            add_to_//schedule
+            add_to_schedule
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
