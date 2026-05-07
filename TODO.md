@@ -1,9 +1,9 @@
 # 🛠 Kairos Development State
 
-## 🚩 Current Phase: Phase 2 (Cognitive Orchestration)
-**Goal:** Transform the prototype into a smart, autonomous orchestrator.
+## 🚩 Current Phase: Phase 3 (Environmental Mastery)
+**Goal:** Transform the orchestrator into a psychologically intelligent system that manages transitions, rewards, and environmental scaffolding.
 
-### ✅ Completed
+### ✅ Completed (Phase 1 & 2)
 - [x] Project Vision & Design (`DESIGN.md`)
 - [x] GitHub Repository Setup
 - [x] R&D Evolution Loop (Cron)
@@ -25,13 +25,22 @@
 - [x] **Tailwind CSS:** Full utility-class styling with Catppuccin Mocha palette
 - [x] **The Focus Veil:** Advanced Hyprland rules — close blocked apps, suppress notifications, change wallpaper during focus sessions. Configurable via Settings panel with per-app blocking, wallpaper paths, and notification toggle.
 
-### 🏗 In Progress
-*(None — Phase 2 complete!)*
+### 🏗 In Progress (Phase 3)
+- [x] **Dopamine Layering:** Satisfying visual/auditory feedback on step completion — confetti animations, celebration on task 100%, checkbox pop effects, progress bar animations, and completion sounds.
+- [ ] **The Bridge:** Interstitial journaling overlay between tasks to reduce transition paralysis.
 
 ### 📅 Pending (Phase 3)
 - [ ] **The Flow-Modoro:** Adaptive timing — extend timer automatically if user is in flow state
-- [ ] **Dopamine Layering:** Satisfying visual/auditory pings on step completion
 - [ ] **The Priming Protocol:** Pre-task checklist (water, phone away, IDE open) before timer starts
+- [ ] **Zeigarnik Momentum Bridge:** 2-minute ignition steps to bypass initiation friction
+- [ ] **If-Then Protocol:** Implementation intentions engine with conditional triggers
+- [ ] **Metacognitive Scaffolding:** Real-time self-monitoring prompts during focus
+- [ ] **Adaptive Dopamine Menu:** Structured reward tiers (Appetizers/Mains/Desserts)
+- [ ] **Contextual Cue Surfacing:** Environmental scaffolding with pre-task cue checklists
+- [ ] **Attention Residue Flush:** 3-step cognitive dump between tasks
+- [ ] **Soft-Launch Transition:** 60-second preview of next task with no performance expectation
+- [ ] **AI Virtual Body Double:** Persistent ambient AI presence during focus sessions
+- [ ] **5C Protocol:** Capture → Close → Clear → Cue → Commit transition ritual
 - [ ] **The Onboarding:** Refine Installation Guide for zero-friction setup
 - [ ] **The Community:** Theme sharing system (JSON based)
 - [ ] **The Windows Port:** Final build and verification for Windows

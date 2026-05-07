@@ -21,24 +21,17 @@ const App = () => {
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden" style={{ background: 'var(--bg-base)' }}>
       {/* Top Bar */}
-      <header className="flex items-center justify-between px-6 py-3 border-b" style={{ borderColor: 'rgba(69,71,90,0.4)' }}>
+      <header className="app-header">
         <div className="flex items-center gap-3">
           <div className="accent-bar w-8" />
-          <h1 className="text-lg font-extrabold tracking-tight" style={{ color: 'var(--mauve)' }}>
-            KAIROS
-          </h1>
-          <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
-            Orchestrator
-          </span>
+          <h1>KAIROS</h1>
+          <span className="subtitle">Orchestrator</span>
         </div>
         <div className="flex items-center gap-4">
-          <span className="font-mono text-sm" style={{ color: 'var(--text-dim)' }}>
-            {clock}
-          </span>
+          <span className="clock-display">{clock}</span>
           <button
             onClick={() => setShowSettings(true)}
-            className="btn px-3 py-1.5 rounded-lg text-xs font-medium"
-            style={{ background: 'var(--bg-overlay)', color: 'var(--text-dim)' }}
+            className="settings-btn"
           >
             ⚙ Settings
           </button>
@@ -46,19 +39,19 @@ const App = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex gap-5 p-5 min-h-0">
+      <main className="main-layout">
         {/* Left: Timer */}
-        <div className="w-72 flex-shrink-0 flex flex-col">
+        <div className="timer-column flex flex-col">
           <Timer />
         </div>
 
         {/* Center: Tasks */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="tasks-column flex flex-col min-h-0">
           <TaskBoard />
         </div>
 
         {/* Right: Schedule */}
-        <div className="w-80 flex-shrink-0 flex flex-col">
+        <div className="schedule-column flex flex-col">
           <PlanView />
         </div>
       </main>

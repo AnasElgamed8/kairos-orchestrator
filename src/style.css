@@ -36,11 +36,13 @@
 body {
   background: var(--bg-base);
   color: var(--text);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', 'Noto Sans', 'Cantarell', 'Liberation Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 /* Glass Panel — solid fallback for WebKitGTK */
@@ -48,6 +50,7 @@ body {
   background: var(--bg-surface);
   border: 1px solid rgba(69, 71, 90, 0.5);
   border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
 
 /* Gradient Accent Bar */
@@ -118,7 +121,7 @@ body {
 
 /* Mono font for timer */
 .font-mono {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'DejaVu Sans Mono', 'Liberation Mono', monospace;
 }
 
 /* Input focus */
@@ -141,4 +144,206 @@ input:focus, select:focus, textarea:focus {
 /* Subtle text selection */
 ::selection {
   background: rgba(203, 166, 247, 0.3);
+}
+
+/* ── Dopamine Layer Animations ────────────────────────────── */
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-30px) rotate(180deg) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px) rotate(360deg) scale(0.8);
+  }
+}
+
+@keyframes celebration-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes step-complete-flash {
+  0% {
+    background-color: var(--green);
+    transform: scale(1);
+  }
+  50% {
+    background-color: var(--teal);
+    transform: scale(1.05);
+  }
+  100% {
+    background-color: var(--bg-mantle);
+    transform: scale(1);
+  }
+}
+
+@keyframes progress-fill {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: var(--target-width);
+  }
+}
+
+/* Step completion flash */
+.step-flash {
+  animation: step-complete-flash 0.3s ease-out;
+}
+
+/* Task completion glow */
+.task-complete {
+  box-shadow: 0 0 20px rgba(166, 227, 161, 0.3), 0 0 40px rgba(166, 227, 161, 0.1);
+  border-color: var(--green) !important;
+}
+
+/* Checkbox completion animation */
+.checkbox.completing {
+  animation: checkbox-pop 0.2s ease-out;
+}
+
+@keyframes checkbox-pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Progress bar animation */
+.progress-bar-animated {
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Subtle shake for energy dots when task is high energy */
+@keyframes energy-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+.energy-dot.high-energy {
+  animation: energy-pulse 2s ease-in-out infinite;
+}
+
+/* Task card hover effect */
+.task-card {
+  transition: all 0.2s ease;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Smooth step toggle */
+.step-toggle {
+  transition: all 0.15s ease;
+}
+
+.step-toggle:hover {
+  background: rgba(203, 166, 247, 0.1);
+}
+
+.step-toggle:active {
+  transform: scale(0.98);
+}
+
+/* ── Responsive Layout Helpers ────────────────────────────── */
+
+.main-layout {
+  display: flex;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  height: 100%;
+  min-height: 0;
+}
+
+.main-layout > .timer-column {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.main-layout > .tasks-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.main-layout > .schedule-column {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+/* ── Header Styling ───────────────────────────────────────── */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid rgba(69, 71, 90, 0.4);
+  background: var(--bg-mantle);
+}
+
+.app-header h1 {
+  font-size: 1.125rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--mauve);
+}
+
+.app-header .subtitle {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ── Settings Button ──────────────────────────────────────── */
+
+.settings-btn {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--bg-overlay);
+  color: var(--text-dim);
+  transition: all 0.15s ease;
+}
+
+.settings-btn:hover {
+  background: var(--bg-overlay2);
+}
+
+/* ── Clock Display ────────────────────────────────────────── */
+
+.clock-display {
+  font-family: 'JetBrains Mono', 'Fira Code', 'DejaVu Sans Mono', monospace;
+  font-size: 0.875rem;
+  color: var(--text-dim);
+  font-weight: 500;
 }
