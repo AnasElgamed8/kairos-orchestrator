@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --bg-color: #1e1e2e;
   --text-color: #cdd6f4;
@@ -11,6 +15,24 @@
   --glass-bg: rgba(49, 50, 68, 0.7);
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 3px;
+}
+
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -18,11 +40,6 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
 }
 
 .glass-panel {
@@ -30,32 +47,9 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
-  border-radius: 24px;
-  padding: 24px;
+  border-radius: 16px;
+  padding: 16px;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-}
-
-.btn-primary {
-  background-color: var(--primary-color);
-  color: var(--bg-color);
-  font-weight: 700;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(203, 166, 247, 0.4);
-}
-
-.btn-secondary {
-  background-color: var(--surface-color);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background-color: var(--border-color);
 }
 
 /* Animations */
@@ -66,4 +60,13 @@ body {
 
 .fade-in {
   animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(203, 166, 247, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(203, 166, 247, 0.4); }
+}
+
+.timer-active {
+  animation: pulse-glow 2s ease-in-out infinite;
 }

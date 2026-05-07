@@ -59,7 +59,13 @@ impl TaskManager {
         self.save();
     }
 
-    pub async fn decompose_with_ai(&self, task_id: uuid::Uuid, api_key: &str) -> Result<(), String> {
+    pub async fn decompose_with_ai(
+        &self,
+        task_id: uuid::Uuid,
+        api_key: &str,
+        model: &str,
+        base_url: &str,
+    ) -> Result<(), String> {
         let task_title = {
             let tasks = self.tasks.lock().unwrap();
             tasks.iter().find(|t| t.id == task_id)
@@ -69,25 +75,39 @@ impl TaskManager {
 
         let prompt = format!(
             "Break down the task '{}' into 4-6 extremely small, concrete, physical first steps. \
-            Each step should be a simple action. Return ONLY a JSON array of strings. \
-            Example: [\"Open the book\", \"Read page 1\"]", 
+            Each step should be a simple action that takes less than 2 minutes. \
+            Return ONLY a JSON array of strings. \
+            Example: [\"Open the book\", \"Read page 1\", \"Write one sentence\"]", 
             task_title
         );
 
-        let response = self.http_client.post("https://api.openai.com/v1/chat/completions")
+        let url = format!("{}/chat/completions", base_url);
+
+        let response = self.http_client.post(&url)
             .bearer_auth(api_key)
             .json(&serde_json::json!({
-                "model": "gpt-4o",
+                "model": model,
                 "messages": [{"role": "user", "content": prompt}],
                 "response_format": { "type": "json_object" }
             }))
             .send()
             .await
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| format!("Request failed: {}", e))?;
+
+        let status = response.status();
+        if !status.is_success() {
+            let body = response.text().await.unwrap_or_default();
+            return Err(format!("API error ({}): {}", status, body));
+        }
 
         let json: serde_json::Value = response.json().await.map_err(|e| e.to_string())?;
-        let content = json["choices"][0]["message"]["content"].as_str().ok_or("Invalid AI response")?;
-        let steps: Vec<String> = serde_json::from_str(content).map_err(|e| e.to_string())?;
+        let content = json["choices"][0]["message"]["content"]
+            .as_str()
+            .ok_or("Invalid AI response: missing content")?;
+        
+        // Try to parse the content as JSON array
+        let steps: Vec<String> = serde_json::from_str(content)
+            .map_err(|e| format!("Failed to parse AI steps: {}. Raw: {}", e, content))?;
 
         self.apply_steps(task_id, steps);
         Ok(())
@@ -101,6 +121,33 @@ impl TaskManager {
                 description: s,
                 completed: false,
             }).collect();
+        }
+        drop(tasks);
+        self.save();
+    }
+
+    pub fn toggle_step(&self, task_id: uuid::Uuid, step_id: uuid::Uuid) {
+        let mut tasks = self.tasks.lock().unwrap();
+        if let Some(task) = tasks.iter_mut().find(|t| t.id == task_id) {
+            if let Some(step) = task.steps.iter_mut().find(|s| s.id == step_id) {
+                step.completed = !step.completed;
+            }
+        }
+        drop(tasks);
+        self.save();
+    }
+
+    pub fn delete_task(&self, task_id: uuid::Uuid) {
+        let mut tasks = self.tasks.lock().unwrap();
+        tasks.retain(|t| t.id != task_id);
+        drop(tasks);
+        self.save();
+    }
+
+    pub fn set_active_task(&self, task_id: uuid::Uuid) {
+        let mut tasks = self.tasks.lock().unwrap();
+        for task in tasks.iter_mut() {
+            task.is_active = task.id == task_id;
         }
         drop(tasks);
         self.save();

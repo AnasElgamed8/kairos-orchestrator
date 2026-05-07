@@ -55,4 +55,13 @@ impl ScheduleManager {
         drop(plan);
         self.save();
     }
+
+    pub fn take_due_task(&self, hhmm: &str) -> Option<ScheduledTask> {
+        let mut plan = self.daily_plan.lock().unwrap();
+        let due_index = plan.iter().position(|item| item.scheduled_time == hhmm)?;
+        let due = plan.remove(due_index);
+        drop(plan);
+        self.save();
+        Some(due)
+    }
 }
