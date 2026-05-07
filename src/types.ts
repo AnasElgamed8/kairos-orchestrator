@@ -25,8 +25,17 @@ export interface ScheduledTask {
   energy_cost: number;
 }
 
+export interface FocusVeilConfig {
+  blocked_apps: string[];
+  focus_wallpaper: string | null;
+  default_wallpaper: string | null;
+  suppress_notifications: boolean;
+  enabled: boolean;
+}
+
 export interface AppConfig {
   openai_api_key: string | null;
   openai_model: string;
   openai_base_url: string;
+  focus_veil: FocusVeilConfig;
 }

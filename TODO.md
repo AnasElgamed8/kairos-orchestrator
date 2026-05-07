@@ -23,14 +23,18 @@
 - [x] **Step Completion:** Toggle tiny steps with persistent state
 - [x] **Task Deletion:** Remove tasks from the board
 - [x] **Tailwind CSS:** Full utility-class styling with Catppuccin Mocha palette
+- [x] **The Focus Veil:** Advanced Hyprland rules — close blocked apps, suppress notifications, change wallpaper during focus sessions. Configurable via Settings panel with per-app blocking, wallpaper paths, and notification toggle.
 
 ### 🏗 In Progress
-- [ ] **The Focus Veil:** Advanced Hyprland rules (blocking apps/changing wallpapers)
+*(None — Phase 2 complete!)*
 
-### 📅 Pending
-- [ ] **The Onboarding:** Refine Installation Guide for zero-friction setup.
-- [ ] **The Community:** Theme sharing system (JSON based).
-- [ ] **The Windows Port:** Final build and verification for Windows.
+### 📅 Pending (Phase 3)
+- [ ] **The Flow-Modoro:** Adaptive timing — extend timer automatically if user is in flow state
+- [ ] **Dopamine Layering:** Satisfying visual/auditory pings on step completion
+- [ ] **The Priming Protocol:** Pre-task checklist (water, phone away, IDE open) before timer starts
+- [ ] **The Onboarding:** Refine Installation Guide for zero-friction setup
+- [ ] **The Community:** Theme sharing system (JSON based)
+- [ ] **The Windows Port:** Final build and verification for Windows
 
 ---
 
@@ -40,3 +44,4 @@
 - **Core Philosophy:** First Physical Movement → Energy Budgeting → Flow State.
 - **Launch Command:** `WEBKIT_DISABLE_COMPOSITING_MODE=1 npm run tauri dev`
 - **Memory Strategy:** Read `DESIGN.md` → `TODO.md` → `BACKLOG.md` at start of every session.
+- **SSH Push:** Use `git@github.com:AnasElgamed8/kairos-orchestrator.git` with SSH key at `~/.ssh/id_ed25519`

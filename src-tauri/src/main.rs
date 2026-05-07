@@ -8,7 +8,7 @@ use timer::{TimerManager, TimerState};
 use tasks::{TaskManager, Task};
 use schedule::{ScheduleManager, ScheduledTask};
 use hyprland::HyprlandManager;
-use config::{ConfigManager, AppConfig};
+use config::{ConfigManager, AppConfig, FocusVeilConfig};
 use tauri::State;
 use std::sync::Arc;
 use uuid::Uuid;
@@ -18,10 +18,15 @@ use chrono::Local;
 // ── Timer Commands ──────────────────────────────────────────────
 
 #[tauri::command]
-fn toggle_timer(state: State<'_, Arc<TimerManager>>, hypr: State<'_, Arc<HyprlandManager>>) {
+fn toggle_timer(
+    state: State<'_, Arc<TimerManager>>,
+    hypr: State<'_, Arc<HyprlandManager>>,
+    cfg: State<'_, Arc<ConfigManager>>,
+) {
     state.toggle();
     let is_running = state.state.lock().unwrap().is_running;
-    hypr.trigger_focus_mode(is_running);
+    let veil_config = cfg.get_config().focus_veil;
+    hypr.trigger_focus_mode(is_running, &veil_config);
 }
 
 #[tauri::command]
@@ -106,6 +111,7 @@ fn auto_trigger_now(
     tasks: State<'_, Arc<TaskManager>>,
     schedule: State<'_, Arc<ScheduleManager>>,
     hypr: State<'_, Arc<HyprlandManager>>,
+    cfg: State<'_, Arc<ConfigManager>>,
 ) {
     let now = Local::now().format("%H:%M").to_string();
 
@@ -131,8 +137,8 @@ fn auto_trigger_now(
         timer_state.is_running = true;
         drop(timer_state);
 
-        // Trigger focus mode via Hyprland
-        hypr.trigger_focus_mode(true);
+        let veil_config = cfg.get_config().focus_veil;
+        hypr.trigger_focus_mode(true, &veil_config);
     }
 }
 
@@ -156,6 +162,11 @@ fn set_model(state: State<'_, Arc<ConfigManager>>, model: String) {
 #[tauri::command]
 fn set_base_url(state: State<'_, Arc<ConfigManager>>, url: String) {
     state.set_base_url(url);
+}
+
+#[tauri::command]
+fn set_focus_veil(state: State<'_, Arc<ConfigManager>>, veil: FocusVeilConfig) {
+    state.set_focus_veil(veil);
 }
 
 // ── App Entry ───────────────────────────────────────────────────
@@ -215,6 +226,7 @@ async fn main() {
             set_api_key,
             set_model,
             set_base_url,
+            set_focus_veil,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
