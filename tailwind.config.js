@@ -6,17 +6,9 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        'bg-color': 'var(--bg-color)',
-        'text-color': 'var(--text-color)',
-        'primary-color': 'var(--primary-color)',
-        'secondary-color': 'var(--secondary-color)',
-        'accent-color': 'var(--accent-color)',
-        'danger-color': 'var(--danger-color)',
-        'success-color': 'var(--success-color)',
-        'surface-color': 'var(--surface-color)',
-        'border-color': 'var(--border-color)',
-        'glass-bg': 'var(--glass-bg)',
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
       },
     },
   },

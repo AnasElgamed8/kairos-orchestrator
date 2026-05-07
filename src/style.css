@@ -3,70 +3,142 @@
 @tailwind utilities;
 
 :root {
-  --bg-color: #1e1e2e;
-  --text-color: #cdd6f4;
-  --primary-color: #cba6f7;
-  --secondary-color: #fab387;
-  --accent-color: #f5c2e7;
-  --danger-color: #f38ba8;
-  --success-color: #a6e3a1;
-  --surface-color: #313244;
-  --border-color: #45475a;
-  --glass-bg: rgba(49, 50, 68, 0.7);
+  /* Catppuccin Mocha */
+  --bg-base: #11111b;
+  --bg-mantle: #181825;
+  --bg-surface: #1e1e2e;
+  --bg-overlay: #313244;
+  --bg-overlay2: #45475a;
+  --text: #cdd6f4;
+  --text-dim: #a6adc8;
+  --text-muted: #585b70;
+  --mauve: #cba6f7;
+  --pink: #f5c2e7;
+  --red: #f38ba8;
+  --peach: #fab387;
+  --green: #a6e3a1;
+  --teal: #94e2d5;
+  --blue: #89b4fa;
+  --lavender: #b4befe;
+  --sapphire: #74c7ec;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--border-color) transparent;
+  scrollbar-color: var(--bg-overlay2) transparent;
+  box-sizing: border-box;
 }
 
-*::-webkit-scrollbar {
-  width: 6px;
-}
-
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: var(--border-color);
-  border-radius: 3px;
-}
+*::-webkit-scrollbar { width: 5px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: var(--bg-overlay2); border-radius: 3px; }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg-base);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-.glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
+/* Glass Panel — solid fallback for WebKitGTK */
+.glass {
+  background: var(--bg-surface);
+  border: 1px solid rgba(69, 71, 90, 0.5);
   border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+/* Gradient Accent Bar */
+.accent-bar {
+  height: 3px;
+  background: linear-gradient(90deg, var(--mauve), var(--pink), var(--sapphire));
+  border-radius: 2px;
+}
+
+/* Subtle Glow for Active Elements */
+.glow-mauve {
+  box-shadow: 0 0 20px rgba(203, 166, 247, 0.15), 0 0 60px rgba(203, 166, 247, 0.05);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(166, 227, 161, 0.2);
+}
+
+/* Timer Ring Animation */
+@keyframes pulse-ring {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.timer-pulse {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+/* Fade In */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.fade-in {
-  animation: fadeIn 0.3s ease forwards;
+.fade-up {
+  animation: fade-up 0.25s ease forwards;
 }
 
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(203, 166, 247, 0.2); }
-  50% { box-shadow: 0 0 40px rgba(203, 166, 247, 0.4); }
+/* Checkbox */
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--bg-overlay2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
-.timer-active {
-  animation: pulse-glow 2s ease-in-out infinite;
+.checkbox.checked {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+/* Task hover actions */
+.task-actions { opacity: 0; transition: opacity 0.15s; }
+.group:hover .task-actions { opacity: 1; }
+
+/* Energy dots */
+.energy-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* Mono font for timer */
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Input focus */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--mauve) !important;
+}
+
+/* Button base */
+.btn {
+  transition: all 0.12s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* Subtle text selection */
+::selection {
+  background: rgba(203, 166, 247, 0.3);
 }

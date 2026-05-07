@@ -14,7 +14,7 @@ const TaskBoard = () => {
       const currentTasks = await invoke<Task[]>('get_tasks');
       setTasks(currentTasks);
     } catch (e) {
-      console.error("Failed to load tasks", e);
+      console.error('Failed to load tasks', e);
     }
   }, []);
 
@@ -58,10 +58,20 @@ const TaskBoard = () => {
     if (e.key === 'Enter') addTask();
   };
 
-  const getEnergyLabel = (cost: number) => {
-    if (cost <= 1) return '⚡ Low';
-    if (cost <= 3) return '⚡⚡ Med';
-    return '⚡⚡⚡ High';
+  const getEnergyDots = (cost: number) => {
+    const dots = [];
+    const level = cost <= 1 ? 1 : cost <= 3 ? 2 : 3;
+    const colors = { 1: 'var(--teal)', 2: 'var(--peach)', 3: 'var(--red)' };
+    for (let i = 0; i < level; i++) {
+      dots.push(
+        <div
+          key={i}
+          className="energy-dot"
+          style={{ background: colors[level as keyof typeof colors] }}
+        />
+      );
+    }
+    return dots;
   };
 
   const getProgress = (task: Task) => {
@@ -71,71 +81,104 @@ const TaskBoard = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full h-full p-4 overflow-hidden">
+    <div className="glass flex flex-col h-full overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 pt-4 pb-3">
+        <h2 className="text-sm font-bold tracking-wide uppercase" style={{ color: 'var(--text-muted)' }}>
+          Tasks
+        </h2>
+        <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
+          {tasks.length} total
+        </span>
+      </div>
+
       {/* Input Bar */}
-      <div className="glass-panel flex gap-2 items-center">
-        <input
-          value={newTaskTitle}
-          onChange={(e) => setNewTaskTitle(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="What needs to be conquered?"
-          className="bg-transparent border-b border-border-color outline-none flex-grow p-2 text-text-color placeholder:opacity-40"
-        />
-        <select
-          value={energy}
-          onChange={(e) => setEnergy(Number(e.target.value))}
-          className="bg-surface-color text-text-color rounded-md p-2 text-xs"
-        >
-          <option value={1}>Low Energy</option>
-          <option value={3}>Med Energy</option>
-          <option value={5}>High Energy</option>
-        </select>
-        <button
-          onClick={addTask}
-          className="bg-primary-color text-bg-color px-4 py-2 rounded-lg font-bold hover:scale-105 transition-transform"
-        >
-          Add
-        </button>
+      <div className="px-5 pb-4">
+        <div className="flex gap-2 items-center">
+          <input
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="What needs to be conquered?"
+            className="flex-1 bg-transparent rounded-xl px-4 py-2.5 text-sm border"
+            style={{ borderColor: 'var(--bg-overlay2)', color: 'var(--text)' }}
+          />
+          <select
+            value={energy}
+            onChange={(e) => setEnergy(Number(e.target.value))}
+            className="rounded-xl px-3 py-2.5 text-xs border"
+            style={{
+              background: 'var(--bg-overlay)',
+              borderColor: 'var(--bg-overlay2)',
+              color: 'var(--text-dim)',
+            }}
+          >
+            <option value={1}>Low</option>
+            <option value={3}>Med</option>
+            <option value={5}>High</option>
+          </select>
+          <button
+            onClick={addTask}
+            className="btn px-5 py-2.5 rounded-xl text-sm font-bold"
+            style={{ background: 'var(--mauve)', color: 'var(--bg-base)' }}
+          >
+            Add
+          </button>
+        </div>
       </div>
 
       {/* Error Banner */}
       {sliceError && (
-        <div className="glass-panel border-danger-color text-danger-color text-xs p-3 flex justify-between items-center">
+        <div
+          className="mx-5 mb-3 px-4 py-2.5 rounded-xl flex justify-between items-center text-xs"
+          style={{ background: 'rgba(243,139,168,0.1)', border: '1px solid var(--red)', color: 'var(--red)' }}
+        >
           <span className="truncate flex-1 mr-2">{sliceError}</span>
-          <button onClick={() => setSliceError(null)} className="text-danger-color font-bold px-2">✕</button>
+          <button onClick={() => setSliceError(null)} className="font-bold px-1">✕</button>
         </div>
       )}
 
       {/* Task List */}
-      <div className="flex flex-col gap-3 overflow-y-auto flex-1 min-h-0">
-        {tasks.map(task => {
+      <div className="flex-1 overflow-y-auto px-5 pb-5 flex flex-col gap-2.5 min-h-0">
+        {tasks.map((task, idx) => {
           const progress = getProgress(task);
           const isSlicing = slicingId === task.id;
 
           return (
             <div
               key={task.id}
-              className={`glass-panel group hover:border-primary-color transition-colors ${task.is_active ? 'border-primary-color' : ''}`}
+              className="rounded-xl p-4 transition-all group fade-up"
+              style={{
+                background: task.is_active ? 'rgba(203,166,247,0.08)' : 'var(--bg-mantle)',
+                border: `1px solid ${task.is_active ? 'var(--mauve)' : 'rgba(69,71,90,0.3)'}`,
+                animationDelay: `${idx * 30}ms`,
+              }}
             >
               {/* Task Header */}
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <span className="font-bold text-lg truncate">{task.title}</span>
-                  <span className="text-xs opacity-50 whitespace-nowrap">{getEnergyLabel(task.energy_cost)}</span>
+                  <span className="font-semibold text-sm truncate">{task.title}</span>
+                  <div className="flex gap-1">{getEnergyDots(task.energy_cost)}</div>
                 </div>
-                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1.5 task-actions">
                   {task.steps.length === 0 && (
                     <button
                       onClick={() => sliceWithAI(task.id)}
                       disabled={isSlicing}
-                      className="text-xs bg-accent-color text-bg-color px-3 py-1 rounded-full hover:bg-primary-color transition-colors disabled:opacity-50"
+                      className="btn px-3 py-1 rounded-lg text-xs font-medium"
+                      style={{
+                        background: 'var(--pink)',
+                        color: 'var(--bg-base)',
+                        opacity: isSlicing ? 0.5 : 1,
+                      }}
                     >
                       {isSlicing ? 'Slicing...' : '🪄 AI Slice'}
                     </button>
                   )}
                   <button
                     onClick={() => deleteTask(task.id)}
-                    className="text-xs text-danger-color opacity-60 hover:opacity-100 px-2 py-1 transition-opacity"
+                    className="btn px-2 py-1 rounded-lg text-xs"
+                    style={{ color: 'var(--text-muted)' }}
                     title="Delete task"
                   >
                     ✕
@@ -145,41 +188,56 @@ const TaskBoard = () => {
 
               {/* Progress Bar */}
               {progress && (
-                <div className="mb-2">
-                  <div className="flex justify-between text-xs opacity-50 mb-1">
+                <div className="mb-3">
+                  <div className="flex justify-between text-xs mb-1.5" style={{ color: 'var(--text-muted)' }}>
                     <span>{progress.done}/{progress.total} steps</span>
-                    <span>{progress.percent}%</span>
+                    <span className="font-mono">{progress.percent}%</span>
                   </div>
-                  <div className="w-full h-1 bg-border-color rounded-full overflow-hidden">
+                  <div
+                    className="w-full h-1.5 rounded-full overflow-hidden"
+                    style={{ background: 'var(--bg-overlay)' }}
+                  >
                     <div
-                      className="h-full bg-success-color transition-all duration-300"
-                      style={{ width: `${progress.percent}%` }}
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${progress.percent}%`,
+                        background: progress.percent === 100 ? 'var(--green)' : 'var(--mauve)',
+                      }}
                     />
                   </div>
                 </div>
               )}
 
               {/* Steps */}
-              <div className="flex flex-col gap-1.5 ml-2">
+              <div className="flex flex-col gap-2 ml-1">
                 {task.steps.map((step: TinyStep) => (
                   <div
                     key={step.id}
-                    className={`flex items-center gap-2 text-sm cursor-pointer transition-colors ${
-                      step.completed ? 'opacity-50 line-through' : 'opacity-80 hover:opacity-100'
-                    }`}
+                    className="flex items-center gap-2.5 cursor-pointer transition-all"
+                    style={{
+                      opacity: step.completed ? 0.45 : 0.85,
+                    }}
                     onClick={() => toggleStep(task.id, step.id)}
                   >
-                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-                      step.completed ? 'bg-success-color border-success-color' : 'border-border-color'
-                    }`}>
-                      {step.completed && <span className="text-bg-color text-xs">✓</span>}
+                    <div className={`checkbox ${step.completed ? 'checked' : ''}`}>
+                      {step.completed && (
+                        <span style={{ color: 'var(--bg-base)', fontSize: '11px', fontWeight: 'bold' }}>✓</span>
+                      )}
                     </div>
-                    <span>{step.description}</span>
+                    <span
+                      className="text-sm"
+                      style={{
+                        textDecoration: step.completed ? 'line-through' : 'none',
+                        color: 'var(--text)',
+                      }}
+                    >
+                      {step.description}
+                    </span>
                   </div>
                 ))}
                 {task.steps.length === 0 && (
-                  <div className="text-xs italic opacity-40 ml-1">
-                    No tiny steps yet. Hover and use 🪄 AI Slice.
+                  <div className="text-xs italic pl-1" style={{ color: 'var(--text-muted)' }}>
+                    No tiny steps yet — hover and hit 🪄 AI Slice
                   </div>
                 )}
               </div>
@@ -188,8 +246,9 @@ const TaskBoard = () => {
         })}
 
         {tasks.length === 0 && (
-          <div className="flex-1 flex items-center justify-center opacity-30 text-sm">
-            No tasks yet. Add your first one above.
+          <div className="flex-1 flex flex-col items-center justify-center gap-2" style={{ color: 'var(--text-muted)' }}>
+            <span className="text-3xl">🎯</span>
+            <span className="text-sm">No tasks yet. Add your first one above.</span>
           </div>
         )}
       </div>
